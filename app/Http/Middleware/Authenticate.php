@@ -18,4 +18,13 @@ class Authenticate extends Middleware
             return route('login');
         }
     }
+
+    protected function unauthenticated($request, array $guards)
+    {
+        abort(response()->json([
+            'status' => 'error',
+            'message' => 'Unauthenticated, try to login',
+            'data'=> []
+        ], 401));
+    }
 }

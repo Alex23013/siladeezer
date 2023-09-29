@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Models\Song;
 use App\Models\Album;
+use App\Models\Artist;
 
 class SongController extends Controller
 {
@@ -100,6 +101,12 @@ class SongController extends Controller
         ]);  
     }
 
+    /**
+     * Update data of song in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request){
         
         $validator = Validator::make($request->all(),[
@@ -163,6 +170,64 @@ class SongController extends Controller
             'message' => 'Song with id '.$id.' destroyed',
             'data'=> []
         ]);  
+        
+    }
+
+    
+
+    /**
+     * Search song in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+
+    public function search(Request $request){
+        $search = $request->search;
+        if($search == "" || !$search){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No search word detected',
+                'data'=> []
+            ], 404);
+        }
+        //checking if search word matches with any artist name
+        $artists = Artist::where('name', 'ILIKE', "%{$search}%")->get();
+        $songs_rsp = [];
+        foreach($artists as $artist){
+            $songs = $artist->songs;
+            foreach($songs as $song){
+                $songs_rsp[]=Song::with('album.artist')->find($song->id);
+            }
+        }
+        if (count($artists) == 0){
+            //checking if search word matches with any album name
+            $albums = Album::where('name', 'ILIKE', "%{$search}%")->get();
+            $songs_rsp = [];
+            foreach($albums as $album){
+                $songs = $album->songs;
+                foreach($songs as $song){
+                    $songs_rsp[]=Song::with('album.artist')->find($song->id);
+                }
+            }
+        }
+        
+        if (count($artists) == 0 && count($albums) == 0){
+            //checking if search word matches with any song name
+            $songs = Song::where('name', 'ILIKE', "%{$search}%")->get();
+            $songs_rsp = [];
+            foreach($songs as $song){
+                $songs_rsp[]=Song::with('album.artist')->find($song->id);
+            }
+        }
+
+        if($artists){
+            return response()->json([
+                'status' => 'success',
+                'message' => '',
+                'data'=> $songs_rsp
+            ]);  
+        }
         
     }
 }

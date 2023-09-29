@@ -50,6 +50,7 @@ Route::controller(SongController::class)->group(function () {
     Route::get('song/{id}', 'show')->where(['id' => '[0-9]+']);
     Route::post('song/update', 'update');
     Route::get('song/destroy/{id}', 'destroy')->where(['id' => '[0-9]+']);
+    Route::post('song/search', 'search');
 });
 
 Route::controller(chatController::class)->group(function () {

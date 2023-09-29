@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SongController;
 
 /*
@@ -49,4 +50,8 @@ Route::controller(SongController::class)->group(function () {
     Route::get('song/{id}', 'show')->where(['id' => '[0-9]+']);
     Route::post('song/update', 'update');
     Route::get('song/destroy/{id}', 'destroy')->where(['id' => '[0-9]+']);
+});
+
+Route::controller(chatController::class)->group(function () {
+    Route::post('chat', 'chat');
 });
